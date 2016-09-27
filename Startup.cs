@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using WeiXinCore.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MySQL.Data.EntityFrameworkCore.Extensions;
+using Pomelo.EntityFrameworkCore;
 
 namespace WeiXinCore
 {
@@ -31,12 +31,12 @@ namespace WeiXinCore
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AppDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("AppMySqlConnStr")));
+            services.AddDbContext<AppDbContext>(options => options.UseMySql(Configuration.GetConnectionString("AppMySqlConnStr")));
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole();
             
@@ -50,17 +50,17 @@ namespace WeiXinCore
             //    await context.Response.WriteAsync("Hello World!");
             //});
 
-            await InitDatabase(app.ApplicationServices);
+            InitDatabase(app.ApplicationServices);
 
         }
 
 
-        private async Task InitDatabase(IServiceProvider serviceProvider)
+        private void InitDatabase(IServiceProvider serviceProvider)
         {
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var db = serviceScope.ServiceProvider.GetService<AppDbContext>();
-                await db.Database.MigrateAsync();
+                db.Database.Migrate();
             }
         }
     }

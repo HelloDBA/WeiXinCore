@@ -8,13 +8,13 @@ using WeiXinCore.Data;
 namespace WeiXinCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20160927055739_DBInit")]
+    [Migration("20160927082059_DBInit")]
     partial class DBInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .HasAnnotation("ProductVersion", "1.0.0-rtm-21431");
+                .HasAnnotation("ProductVersion", "1.0.1");
 
             modelBuilder.Entity("WeiXinCore.Models.VERB", b =>
                 {
