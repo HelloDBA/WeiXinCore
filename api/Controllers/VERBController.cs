@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WeiXinCore.Data;
 using WeiXinCore.Models;
+using System.Security.Cryptography;
+using System.Text;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,44 +21,43 @@ namespace WeiXinCore.api.Controllers
             _context = context;
         }
         // GET: api/values
-        [HttpGet]
-        public string Get()
+        [HttpGet("{memberID}")]
+        public string Get(string memberID, [FromQuery] string signature, string timestamp, string nonce, string echostr)
         {
-            VERB verb = new Models.VERB()
-            {
-                memberID = "test"+DateTime.Now.ToString(),
-                Token = "SMBlog Test"
-            };
+            VERB verb = new VERB();
+            verb = _context.VERB.FirstOrDefault(o=>o.memberID==memberID);
+            string _rtstr = Guid.NewGuid().ToString().Replace("-","");
 
-            _context.VERB.Add(verb);
-           _context.SaveChanges();
-            return _context.VERB.Count().ToString();
+            if (verb != null)
+            {
+                string token = verb.Token;
+                if (CheckSignature(token, signature, timestamp, nonce))
+                {
+                    _rtstr = echostr;
+                }
+            }
+            return _rtstr;
             //return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        private bool CheckSignature(string token, string signature, string timestamp, string nonce)
         {
-            return "value";
+            string[] ArrTmp = { token, timestamp, nonce };
+
+            Array.Sort(ArrTmp);
+            string tmpStr = string.Join("", ArrTmp);
+
+            tmpStr= BitConverter.ToString(SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(tmpStr))).Replace("-", "").ToLower();
+            
+            if (tmpStr == signature)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
     }
 }

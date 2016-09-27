@@ -8,7 +8,7 @@ using WeiXinCore.Data;
 namespace WeiXinCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20160927082059_DBInit")]
+    [Migration("20160927082959_DBInit")]
     partial class DBInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
