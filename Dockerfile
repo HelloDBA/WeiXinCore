@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.0-core-deps
+FROM microsoft/dotnet:1.0.0-preview2-sdk
 MAINTAINER  HelloDBA <hellodba@live.com>
 COPY . /app
 WORKDIR /app
